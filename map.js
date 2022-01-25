@@ -28,19 +28,13 @@ const PHOTO_AD = [
   "http://o0.github.io/assets/images/tokyo/hotel3.jpg",
 ];
 
-let getRandomNumberRange = function (min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-};
-
-let i = 0;
-
-const textAd = [
-  {
+function getItem(index, location) {
+  return {
     author: {
-      avatar: `img/avatars/user0${i++}.png`,
+      avatar: `img/avatars/user0${index + 1}.png`,
     },
     offer: {
-      title: TITLE_AD[i++],
+      title: TITLE_AD[index],
       address: `${location.x}, ${location.y}`,
       price: Math.random(getRandomNumberRange(1000, 1000000)),
       type: TYPE_AD[Math.floor(Math.random() * TYPE_AD.length)],
@@ -52,22 +46,38 @@ const textAd = [
       description: "",
       photos: PHOTO_AD[Math.random() * PHOTO_AD.length],
     },
-    location: {
-      x: Math.floor(Math.random(getRandomNumberRange(130, 630))),
-      y: Math.floor(Math.random(getRandomNumberRange(130, 630))),
-    },
-  },
-];
+    location: location,
+  };
+}
+
+let getRandomNumberRange = function (min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+};
+
+const pinContainer = document.querySelector(".map__pins");
+const mapPinTemplate = document
+  .querySelector("#template")
+  .content.querySelector(".map__pin");
+
+const fragment = document.createDocumentFragment();
+
+for (let i = 0; i < 8; i++) {
+  let mapPinClone = mapPinTemplate.cloneNode(true);
+  let imgClone = mapPinClone.querySelector("img");
+  const location = {
+    x: Math.floor(getRandomNumberRange(130, 630)),
+    y: Math.floor(getRandomNumberRange(130, 630)),
+  };
+
+  const item = getItem(i, location);
+
+  mapPinClone.style = `left: ${location.x}px; top: ${location.y}px;`;
+  imgClone.src = item.author.avatar;
+  imgClone.alt = item.offer.title;
+
+  pinContainer.appendChild(mapPinClone);
+}
 
 document.querySelector(".map").classList.remove("map--faded");
 
-const map = document.querySelector(".map");
-const template = document
-  .querySelector("#template")
-  .content.querySelector(".map__card");
-
-for (let i = 0; i < textAd.length; i++) {
-  let templateClone = template.cloneNode(true);
-
-  map.appendChild(templateClone);
-}
+let mapCardClone = template.content.querySelector(".map__card").cloneNode(true);
